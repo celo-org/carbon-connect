@@ -10,26 +10,26 @@ import { Alfajores, Celo } from "@celo/rainbowkit-celo/chains";
 
 const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string; // get one at https://cloud.walletconnect.com/app
 
+const appInfo = {
+    appName: "Carbon Connect", // TODO is this the right place to define?
+};
+
 const { chains, publicClient } = configureChains(
     [Celo, Alfajores],
-    [publicProvider()]
+    [publicProvider()] // TODO why is this different from example dapps?
 );
 
 const connectors = celoGroups({
     chains,
     projectId,
     appName:
-        (typeof document === "object" && document.title) || "Your App Name",
+        (typeof document === "object" && document.title) || appInfo.appName, // TODO what is this 'document' stuff? 
 });
-
-const appInfo = {
-    appName: "Celo Composer",
-};
 
 const wagmiConfig = createConfig({
     autoConnect: true,
     connectors,
-    publicClient: publicClient,
+    publicClient,
 });
 
 function App({ Component, pageProps }: AppProps) {
@@ -37,9 +37,9 @@ function App({ Component, pageProps }: AppProps) {
         <WagmiConfig config={wagmiConfig}>
             <RainbowKitProvider
                 chains={chains}
-                appInfo={appInfo}
+                appInfo={appInfo} // TODO why is this different from example dapps
                 coolMode={true}
-            >
+            > 
                 <Layout>
                     <Component {...pageProps} />
                 </Layout>
