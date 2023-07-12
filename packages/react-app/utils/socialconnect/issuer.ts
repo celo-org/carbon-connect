@@ -1,14 +1,12 @@
 import { Contract, Wallet, ethers } from "ethers";
 import {
-    ACCOUNTS_CONTRACT,
-    ACCOUNTS_PROXY_ADDRESS,
     ALFAJORES_CUSD_ADDRESS,
     FA_CONTRACT,
     FA_PROXY_ADDRESS,
     ODIS_PAYMENTS_CONTRACT,
     ODIS_PAYMENTS_PROXY_ADDRESS,
     STABLE_TOKEN_CONTRACT,
-} from "./constants";
+} from "../constants";
 import { OdisUtils } from "@celo/identity";
 import {
     AuthSigner,
@@ -21,8 +19,7 @@ export const ONE_CENT_CUSD = ethers.utils.parseEther("0.01");
 
 export const NOW_TIMESTAMP = Math.floor(new Date().getTime() / 1000);
 
-export class SocialConnnectClient {
-    private readonly accountsContract: Contract
+export class SocialConnnectIssuer {
     private readonly federatedAttestationsContract: Contract
     private readonly odisPaymentsContract: Contract
     private readonly stableTokenContract: Contract
@@ -34,22 +31,17 @@ export class SocialConnnectClient {
         context: OdisContextName
     ) {
         this.serviceContext = OdisUtils.Query.getServiceContext(context)
-        this.accountsContract =  new ethers.Contract(
-            ACCOUNTS_PROXY_ADDRESS,
-            ACCOUNTS_CONTRACT.abi,
-            this.wallet
-        )
-        this.federatedAttestationsContract = new ethers.Contract(
+        this.federatedAttestationsContract = new Contract(
             FA_PROXY_ADDRESS,
             FA_CONTRACT.abi,
             this.wallet
         )
-        this.odisPaymentsContract = new ethers.Contract(
+        this.odisPaymentsContract = new Contract(
             ODIS_PAYMENTS_PROXY_ADDRESS,
             ODIS_PAYMENTS_CONTRACT.abi,
             this.wallet
         )
-        this.stableTokenContract = new ethers.Contract(
+        this.stableTokenContract = new Contract(
             ALFAJORES_CUSD_ADDRESS,
             STABLE_TOKEN_CONTRACT.abi,
             this.wallet
@@ -129,12 +121,16 @@ export class SocialConnnectClient {
         }
     }
 
-    async lookupAddresses(plaintextId: string) {
+    async lookup(plaintextId: string) {
+        const obfuscatedID = await this.getObfuscatedId(plaintextId)
         const attestations = await this.federatedAttestationsContract.lookupAttestations(
             await this.getObfuscatedIdWithQuotaRetry(plaintextId),
             [ this.wallet.address ]
         )
       
-        return attestations.accounts as string[]; // TODO typesafety
+        return {
+            accounts: attestations.accounts as string[], // TODO typesafety
+            obfuscatedID
+        }
     }
 }

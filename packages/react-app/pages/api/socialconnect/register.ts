@@ -1,4 +1,4 @@
-import { SocialConnect, SocialConnectResponse, handle } from "@/pages/handler";
+import { SocialConnectIssuer, SocialConnectResponse, handle } from "@/pages/handler";
 import type { NextApiRequest, NextApiResponse } from "next"
 
 export default async function register(req: NextApiRequest, res: NextApiResponse<SocialConnectResponse>) {
@@ -6,5 +6,5 @@ export default async function register(req: NextApiRequest, res: NextApiResponse
   const address = req.query.address as string; // TODO typesafety
   console.log(plaintextId)
   console.log(address)
-  await handle(req, res, SocialConnect.registerOnChainIdentifier(plaintextId, address))
+  await handle(req, res, SocialConnectIssuer.registerOnChainIdentifier(plaintextId, address))
 }

@@ -7,6 +7,7 @@ import "../styles/globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { publicProvider } from "wagmi/providers/public";
 import { Alfajores, Celo } from "@celo/rainbowkit-celo/chains";
+import { SessionProvider } from "next-auth/react";
 
 const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID as string; // get one at https://cloud.walletconnect.com/app
 
@@ -39,10 +40,12 @@ function App({ Component, pageProps }: AppProps) {
                 chains={chains}
                 appInfo={appInfo} // TODO why is this different from example dapps
                 coolMode={true}
-            > 
-                <Layout>
-                    <Component {...pageProps} />
-                </Layout>
+            >
+                <SessionProvider session={pageProps.session}>
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
+                </SessionProvider> 
             </RainbowKitProvider>
         </WagmiConfig>
     );
