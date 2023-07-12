@@ -1,18 +1,18 @@
 import { OdisUtils } from "@celo/identity"
 import { OdisContextName, ServiceContext } from "@celo/identity/lib/odis/query"
 import { Contract, Wallet } from "ethers"
-import { ALFAJORES_CUSD_ADDRESS, FA_CONTRACT, FA_PROXY_ADDRESS, STABLE_TOKEN_CONTRACT } from "../constants"
+import { ALFAJORES_CARBON_TOKEN_ADDRESS, CARBON_TOKEN_CONTRACT, FA_CONTRACT, FA_PROXY_ADDRESS } from "../constants"
 import { Escrow } from "../escrow"
 
 export class SocialConnectClient {
-    private readonly federatedAttestationsContract: Contract
-    private readonly tokenContract: Contract
-    private readonly escrow: Escrow
+    readonly federatedAttestationsContract: Contract
+    readonly tokenContract: Contract
+    readonly escrow: Escrow
     readonly serviceContext: ServiceContext
 
     constructor(
-        private readonly wallet: Wallet,
-        private readonly trustedIssuers: string[],
+        readonly wallet: Wallet,
+        readonly trustedIssuers: string[],
         context: OdisContextName
     ) {
         this.serviceContext = OdisUtils.Query.getServiceContext(context)
@@ -26,8 +26,8 @@ export class SocialConnectClient {
             this.trustedIssuers,
         )
         this.tokenContract = new Contract(
-            ALFAJORES_CUSD_ADDRESS,
-            STABLE_TOKEN_CONTRACT.abi,
+            ALFAJORES_CARBON_TOKEN_ADDRESS,
+            CARBON_TOKEN_CONTRACT.abi,
             this.wallet
         )
     }
@@ -73,5 +73,23 @@ export class SocialConnectClient {
         }
         return this.tokenContract.tranfer(addresses[0], value)
     }
+}
 
+export class CarbonConnectClient extends SocialConnectClient {
+
+    async claimRegistrationTokens(plaintextId: string) {
+        const { obfuscatedID } = await this.lookup(plaintextId)
+
+        const hasRegistered = await this.tokenContract.hasRegistered(obfuscatedID, this.wallet.address)
+        const hasMinted = await this.tokenContract.hasMinted(obfuscatedID)
+
+        if (!hasMinted && hasRegistered) {
+            await this.tokenContract.mint(obfuscatedID)
+        } 
+    }
+
+    async burnTokens() {
+        const balance = await this.tokenContract.balanceOf(this.wallet.address);
+        await this.tokenContract.burn(balance);
+    }
 }

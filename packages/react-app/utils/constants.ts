@@ -6,6 +6,8 @@ export const ESCROW_CONTRACT = require("./abis/Escrow.json");
 export const ODIS_PAYMENTS_CONTRACT = require("./abis/OdisPayments.json");
 export const STABLE_TOKEN_CONTRACT = require("./abis/StableToken.json");
 export const ACCOUNTS_CONTRACT = require("./abis/Accounts.json");
+export const CARBON_TOKEN_CONTRACT = require("./abis/CarbonToken.json");
+
 
 export const ALFAJORES_RPC = "https://alfajores-forno.celo-testnet.org";
 export const ALFAJORES_ACCOUNT = "0x48522303E536B4299B57e2cC2F0f5fe85f8C316F";
@@ -20,3 +22,5 @@ export const ALFAJORES_CUSD_ADDRESS =
     "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 export const ACCOUNTS_PROXY_ADDRESS =
     "0xed7f51A34B4e71fbE69B3091FcF879cD14bD73A9";
+export const ALFAJORES_CARBON_TOKEN_ADDRESS =
+    "TODO";
